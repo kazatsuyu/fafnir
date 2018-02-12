@@ -1,0 +1,49 @@
+*.a
+*.so
+*.lib
+*.dll
+*.exe
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# CTest
+CTestTestfile.cmake
+Testing
+
+# Makefile
+Makefile
+*.o
+*.obj
+
+# MSVC
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.suo
+.vs/
+Win32/
+x64/
+Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
+
+# Kate
+*.kateproject
+
+# Eclipse
+.cproject
+.project
+
+# CodeLite
+*.project
+*.workspace
+
+# Sublime Text 2
+*.sublime-project
+
+# CodeBlocks
+*.cbp
