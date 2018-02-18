@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_STANDARD 17)
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang|GNU|Intel")
+    set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "MSVC")
+    set(CMAKE_CXX_FLAGS "/std:c++17 ${CMAKE_CXX_FLAGS}")
+endif()
 
 enable_testing()
 
