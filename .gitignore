@@ -8,6 +8,7 @@
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+install_manifest.txt
 
 # CTest
 CTestTestfile.cmake
