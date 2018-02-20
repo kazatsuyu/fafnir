@@ -84,9 +84,6 @@ inline char32_t read_utf16_stream(std::istream& in) noexcept {
             return U'\ufffd';
         }
         tmp |= (ch & 0x3FF);
-        if (tmp < 0x80) {
-            return U'\ufffd';
-        }
         return tmp + U'\U00010000';
     }
 }
@@ -103,14 +100,14 @@ inline void write_utf8_stream(std::ostream& out, char32_t ch) noexcept {
         tmp = char((ch & 0b0011'1111) | 0b1000'0000);
         out.write(&tmp, 1);
     } else if (ch < 0x10000) {
-        auto tmp = char((ch >> 12) | 0b1100'0000);
+        auto tmp = char((ch >> 12) | 0b1110'0000);
         out.write(&tmp, 1);
         tmp = char(((ch >> 6) & 0b0011'1111) | 0b1000'0000);
         out.write(&tmp, 1);
         tmp = char((ch & 0b0011'1111) | 0b1000'0000);
         out.write(&tmp, 1);
     } else {
-        auto tmp = char((ch >> 18) | 0b1100'0000);
+        auto tmp = char((ch >> 18) | 0b1111'0000);
         out.write(&tmp, 1);
         tmp = char(((ch >> 12) & 0b0011'1111) | 0b1000'0000);
         out.write(&tmp, 1);

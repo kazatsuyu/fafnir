@@ -1,11 +1,9 @@
 
-add_executable(sample_test sample_test.cpp)
+add_executable(unicode_test unicode_test.cpp)
 
 add_test(
-    NAME sample_test
-    COMMAND $<TARGET_FILE:sample_test>
-    CONFIGURATIONS Debug Release
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/tmp
+    NAME unicode_test
+    COMMAND $<TARGET_FILE:unicode_test>
 )
 
-set_tests_properties(sample_test PROPERTIES LABELS sample)
+set_tests_properties(unicode_test PROPERTIES LABELS unicode)
