@@ -1,6 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ClangTarget>amd64-pc-windows-msvc</ClangTarget>
+    <ClangTarget Condition="'$(Platform)'=='x64'">amd64-pc-windows-msvc</ClangTarget>
+    <ClangTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</ClangTarget>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,14 +24,19 @@
 
   <PropertyGroup>
     <LLVMDir>{{LLVMDir}}</LLVMDir>
-    <ExecutablePath Condition="'$(ExecutablePath)' == ''">$(MSBuildThisFileDirectory)\bin;$(LLVMDir)\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExecutablePath Condition="'$(Platform)'=='x64' AND '$(ExecutablePath)' == ''">$(MSBuildThisFileDirectory)\bin;$(LLVMDir)\bin;$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExecutablePath Condition="'$(Platform)'=='Win32' AND '$(ExecutablePath)' == ''">$(MSBuildThisFileDirectory)\bin;$(LLVMDir)\bin;$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
     <IncludePath Condition="'$(IncludePath)' == ''">$(LLVMDir)\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <ReferencePath Condition="'$(ReferencePath)' == ''">$(VC_ReferencesPath_x64);</ReferencePath>
-    <LibraryPath Condition="'$(LibraryPath)' == ''">$(LLVMDir)\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <ReferencePath Condition="'$(Platform)'=='x64' AND '$(ReferencePath)' == ''">$(VC_ReferencesPath_x64);</ReferencePath>
+    <ReferencePath Condition="'$(Platform)'=='Win32' AND '$(ReferencePath)' == ''">$(VC_ReferencesPath_x86);</ReferencePath>
+    <LibraryPath Condition="'$(Platform)'=='x64' AND '$(LibraryPath)' == ''">$(LLVMDir)\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <LibraryPath Condition="'$(Platform)'=='Win32' AND '$(LibraryPath)' == ''">$(LLVMDir)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <LibraryWPath Condition="'$(LibraryWPath)' == ''">$(WindowsSDK_MetadataPath);</LibraryWPath>
     <SourcePath Condition="'$(SourcePath)' == ''">$(VC_SourcePath);</SourcePath>
-    <ExcludePath Condition="'$(ExcludePath)' == ''">$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x64);</ExcludePath>
-    <DebugCppRuntimeFilesPath Condition="'$(DebugCppRuntimeFilesPath)' == ''">$(VCToolsInstallDir)redist\Debug_NonRedist\x64</DebugCppRuntimeFilesPath>
+    <ExcludePath Condition="'$(Platform)'=='x64' AND '$(ExcludePath)' == ''">$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x64);</ExcludePath>
+    <ExcludePath Condition="'$(Platform)'=='Win32' AND '$(ExcludePath)' == ''">$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
+    <DebugCppRuntimeFilesPath Condition="'$(Platform)'=='x64' AND '$(DebugCppRuntimeFilesPath)' == ''">$(VCToolsInstallDir)redist\Debug_NonRedist\x64</DebugCppRuntimeFilesPath>
+    <DebugCppRuntimeFilesPath Condition="'$(Platform)'=='Win32' AND '$(DebugCppRuntimeFilesPath)' == ''">$(VCToolsInstallDir)redist\Debug_NonRedist\x86</DebugCppRuntimeFilesPath>
   </PropertyGroup>
 
   <Import Project="$(_PlatformFolder)Platform.Common.props" />
