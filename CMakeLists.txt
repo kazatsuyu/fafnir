@@ -13,5 +13,5 @@ enable_testing()
 add_subdirectory(src)
 add_subdirectory(tests)
 
-install(FILES install.bat DESTINATION ".")
+install(FILES install.bat README.md LICENSE DESTINATION ".")
 install(DIRECTORY scripts assets DESTINATION ".")
