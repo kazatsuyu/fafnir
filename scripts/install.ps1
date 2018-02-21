@@ -12,7 +12,7 @@ if (!$principal.IsInRole($role)) {
     }
    $pinfo.Arguments = $arguments
    $pinfo.Verb = "runas"
-   $p = [System.Diagnostics.Process]::Start($pinfo)
+   $null = [System.Diagnostics.Process]::Start($pinfo)
    exit
 }
 $Host.UI.RawUI.WindowTitle = "Fafnir - Clang MSBuild toolset installer"
