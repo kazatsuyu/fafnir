@@ -1,4 +1,4 @@
-param($LLVMDirectory = "", $ToolsetName = ""<#, $ClangClToolsetName = ""#>)
+param($LLVMDirectory = "", $ToolsetName = "", $ClangClToolsetName = "")
 $id=[System.Security.Principal.WindowsIdentity]::GetCurrent()
 $principal=new-object System.Security.Principal.WindowsPrincipal($id)
 
@@ -92,32 +92,28 @@ do {
         }
     }
     
-    <#
     if ($reset -or ($ClangClToolsetName -eq "" -and (Read-Host "Do you want to install a toolset for clang-cl? (y/N)") -match "y|yes")) {
         $prompt = "What is the clang-cl toolset name?"
         if ($reset) {
             $prompt += "(current: $ClangClToolsetName)" 
         } else {
-            $prompt += " (default: v100_clang_fafnir)"
+            $prompt += " (default: fafnir_clang_cl)"
         }
         $tmp = Read-Host $prompt
         if ($tmp -eq "" -and $ClangClToolsetName -eq "") {
             $ClangClToolsetName = "fafnir_clang_cl"
         }
     }
-    #>
     
     ""
     "=== Install configuration ==="
     "* LLVM install directory: $LLVMDirectory"
     "* Toolset name: $ToolsetName"
-    <#
     if ($ClangClToolsetName -eq "") {
         "* Clang-cl toolset won't install."
     } else {
         "* Clang-cl toolset: $ClangClToolsetName"
     }
-    #>
     ""
     $reset = $true
 } while((Read-Host "Is it OK to install? (Y/n)") -match "n|no")
@@ -127,10 +123,11 @@ $assets = "$rootDir\assets"
 $bin = "$rootDir\bin\clang.exe"
 
 function Install ($arch) {
-    if (!(Test-Path "$VSInstallDir\Common7\IDE\VC\VCTargets\Platforms\$arch")) {
+    $platformDir = "$VSInstallDir\Common7\IDE\VC\VCTargets\Platforms\$arch\PlatformToolsets";
+    if (!(Test-Path $platformDir)) {
         return
     }
-    $targetPath = "$VSInstallDir\Common7\IDE\VC\VCTargets\Platforms\$arch\PlatformToolsets\$ToolsetName"
+    $targetPath = "$platformDir\$ToolsetName"
     
     if (!(Test-Path $targetPath)) {
         New-Item -ItemType Directory $targetPath
@@ -144,6 +141,16 @@ function Install ($arch) {
     }
     Copy-Item $bin "$targetPath\bin"
     Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
+
+    if ($ClangClToolsetName -ne "") {
+        $targetPath = "$platformDir\$ClangClToolsetName"
+        if (!(Test-Path $targetPath)) {
+            New-Item -ItemType Directory $targetPath
+        }
+        Copy-Item "$assets\clang-cl\Toolset.targets" "$targetPath"
+        $content = (Get-Content -Encoding UTF8 "$assets\clang-cl\Toolset.props") -replace "{{LLVMDir}}",$LLVMDirectory
+        Set-Content "$targetPath\Toolset.props" $content -Encoding UTF8 | Out-Null
+    }
 }
 
 Install "Win32"
