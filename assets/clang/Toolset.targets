@@ -1,4 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(VCTargetsPath)\Microsoft.CppCommon.targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Clang.targets" />
+  <ItemGroup Condition="'$(ConfigurationType)' != 'Utility'">
+    <PropertyPageSchema Condition="'$(ConfigurationType)' != 'Utility'" Include="$(MSBuildThisFileDirectory)\$(LangID)\clang.xml"/>
+  </ItemGroup>
 </Project>

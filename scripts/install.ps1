@@ -123,7 +123,8 @@ $assets = "$rootDir\assets"
 $bin = "$rootDir\bin\clang.exe"
 
 function Install ($arch) {
-    $platformDir = "$VSInstallDir\Common7\IDE\VC\VCTargets\Platforms\$arch\PlatformToolsets";
+    $VCTargets = "$VSInstallDir\Common7\IDE\VC\VCTargets"
+    $platformDir = "$VCTargets\Platforms\$arch\PlatformToolsets";
     if (!(Test-Path $platformDir)) {
         return
     }
@@ -142,14 +143,64 @@ function Install ($arch) {
     Copy-Item $bin "$targetPath\bin"
     Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
 
+    function Replace-Node($node, $name, $display) {
+        [System.XML.XMLElement] $tmp = $node.CloneNode($true)
+        $tmp.SetAttribute("Name", "$name")
+        $tmp.SetAttribute("Switch", "std=$name")
+        $tmp.SetAttribute("DisplayName",  (($tmp.GetAttribute("DisplayName")) -replace "C\+\+03","C++$display"))
+        $tmp.SetAttribute("Description", (($tmp.GetAttribute("Description")) -replace "C\+\+03","C++$display"))
+        return $tmp
+    }
+    
+    function Create-Lang-File ($langID) {
+        $xml = [Xml](Get-Content "$VCTargets\$langID\clang.xml" -Encoding UTF8)
+        $xmlns = @{ p = "http://schemas.microsoft.com/build/2009/properties" }
+        $std = (Select-Xml "p:EnumProperty[@Name=""CppLanguageStandard""]" $xml.Rule -Namespace $xmlns).Node
+        $cxx98 = (Select-Xml "p:EnumValue[@Name=""c++98""]" $std -Namespace $xmlns).Node
+        $gnuxx98 = (Select-Xml "p:EnumValue[@Name=""gnu++98""]" $std -Namespace $xmlns).Node
+    
+        $tmp = Replace-Node $cxx98 "c++14" "14"
+        $std.InsertBefore($tmp, $gnuxx98) | Out-Null
+        $tmp = Replace-Node $cxx98 "c++17" "17"
+        $std.InsertBefore($tmp, $gnuxx98) | Out-Null
+        $tmp = Replace-Node $cxx98 "c++2a" "20"
+        $std.InsertBefore($tmp, $gnuxx98) | Out-Null
+        
+        $tmp = Replace-Node $gnuxx98 "gnu++14" "14"
+        $std.AppendChild($tmp) | Out-Null
+        $tmp = Replace-Node $gnuxx98 "gnu++17" "17"
+        $std.AppendChild($tmp) | Out-Null
+        $tmp = Replace-Node $gnuxx98 "gnu++2a" "20"
+        $std.AppendChild($tmp) | Out-Null
+    
+        $cxx1y = Select-Xml "p:EnumValue[@Name=""c++1y""]" $std -Namespace $xmlns
+        $gnuxx1y = Select-Xml "p:EnumValue[@Name=""gnu++1y""]" $std -Namespace $xmlns
+        if ($cxx1y) {
+            $std.RemoveChild($cxx1y.Node) | Out-Null
+        }
+        if ($gnuxx1y) {
+            $std.RemoveChild($gnuxx1y.Node) | Out-Null
+        }
+        if (!(Test-Path "$targetPath\$langID")) {
+            New-Item "$targetPath\$langID" -ItemType Directory
+        }
+        $xml.Save("$targetPath\$langID\clang.xml")
+    }
+    
+    foreach($dir in Get-ChildItem $VCTargets -Directory) {
+        if(($dir.Name) -match "[0-9]+") {
+            Create-Lang-File $dir.Name
+        }
+    }
+
     if ($ClangClToolsetName -ne "") {
         $targetPath = "$platformDir\$ClangClToolsetName"
         if (!(Test-Path $targetPath)) {
             New-Item -ItemType Directory $targetPath
         }
         Copy-Item "$assets\clang-cl\Toolset.targets" "$targetPath"
-        $content = (Get-Content -Encoding UTF8 "$assets\clang-cl\Toolset.props") -replace "{{LLVMDir}}",$LLVMDirectory
-        Set-Content "$targetPath\Toolset.props" $content -Encoding UTF8 | Out-Null
+        $tmp = (Get-Content -Encoding UTF8 "$assets\clang-cl\Toolset.props") -replace "{{LLVMDir}}",$LLVMDirectory
+        Set-Content "$targetPath\Toolset.props" $tmp -Encoding UTF8 | Out-Null
     }
 }
 
