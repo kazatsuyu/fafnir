@@ -104,6 +104,8 @@ do {
         $tmp = Read-Host $prompt
         if ($tmp -eq "" -and $ClangClToolsetName -eq "") {
             $ClangClToolsetName = "fafnir_clang_cl"
+        } else {
+            $ClangClToolsetName = $tmp
         }
     }
     
