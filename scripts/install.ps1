@@ -89,6 +89,8 @@ do {
         $tmp = Read-Host $prompt
         if ($tmp -eq "" -and $ToolsetName -eq "") {
             $ToolsetName = "v100_clang_fafnir"
+        } else {
+            $ToolsetName = $tmp
         }
     }
     
@@ -102,6 +104,8 @@ do {
         $tmp = Read-Host $prompt
         if ($tmp -eq "" -and $ClangClToolsetName -eq "") {
             $ClangClToolsetName = "fafnir_clang_cl"
+        } else {
+            $ClangClToolsetName = $tmp
         }
     }
     
