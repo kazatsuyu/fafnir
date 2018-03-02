@@ -8,17 +8,10 @@
 #include <Windows.h>
 
 #include "unicode.hpp"
+#include "fafnir.hpp"
+#include "custom_api.hpp"
 
 namespace fafnir {
-
-std::experimental::filesystem::path get_executable_path() {
-    for(std::vector<wchar_t> buf(256);;buf.resize(buf.size() * 2)) {
-        std::size_t size = GetModuleFileNameW(nullptr, buf.data(), buf.size());
-        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-            return {buf.begin(), buf.begin() + size};
-        }
-    }
-}
 
 enum class file_type {
     utf8,
@@ -96,13 +89,14 @@ std::experimental::filesystem::path read_path(std::istream& in) noexcept {
 int main() {
     using namespace fafnir;
 
-    auto path = get_executable_path().parent_path() / ".target";
+    auto path = get_bin_path() / ".target";
     if (!std::experimental::filesystem::exists(path)) {
         std::wcerr << "error: " << path << " doesn't exist." << std::endl;
         return 1;
     }
     std::ifstream target(path, std::ios::binary);
     auto target_path = read_path(target);
+    target.close();
     if (!std::experimental::filesystem::exists(target_path)) {
         std::wcerr << "error: " << target_path << " doesn't exist." << std::endl;
         return 1;
@@ -130,9 +124,11 @@ int main() {
     cmdbuf.push_back(L'\0');
     STARTUPINFOW si{sizeof(si)};
     PROCESS_INFORMATION pi{};
-    CreateProcessW(target_path.c_str(), cmdbuf.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
-    WaitForSingleObject(pi.hProcess, INFINITE);
+    create_process_w(target_path.c_str(), cmdbuf.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
+    const handle_ptr process{pi.hProcess};
+    const handle_ptr thread{pi.hThread};
+    WaitForSingleObject(process.get(), INFINITE);
     DWORD exit_code;
-    GetExitCodeProcess(pi.hProcess, &exit_code);
+    GetExitCodeProcess(process.get(), &exit_code);
     return exit_code;
 }

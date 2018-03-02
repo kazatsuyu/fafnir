@@ -125,6 +125,7 @@ do {
 $rootDir = Split-Path -Parent $myInvocation.MyCommand.Definition | Split-Path -Parent
 $assets = "$rootDir\assets"
 $bin = "$rootDir\bin\clang.exe"
+$dll = "$rootDir\bin\fafnir_injection.dll"
 
 function Install ($arch) {
     $platformDir = "$VSInstallDir\Common7\IDE\VC\VCTargets\Platforms\$arch\PlatformToolsets";
@@ -144,6 +145,7 @@ function Install ($arch) {
         New-Item -ItemType Directory "$targetPath\bin"
     }
     Copy-Item $bin "$targetPath\bin"
+    Copy-Item $dll "$targetPath\bin"
     Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
 
     if ($ClangClToolsetName -ne "") {
