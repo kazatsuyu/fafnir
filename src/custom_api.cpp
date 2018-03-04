@@ -1,3 +1,4 @@
+#include "set_winver.hpp"
 #include <fstream>
 
 #include "fafnir.hpp"
@@ -143,7 +144,7 @@ BOOL WINAPI set_file_information_by_handle(
 ) {
     if (information_class == FileRenameInfo) {
         auto& info = *static_cast<PFILE_RENAME_INFO>(file_information);
-        std::ofstream(info.FileName, std::ios::ate | std::ios::binary);
+        std::ofstream(fs::path(info.FileName).string(), std::ios::ate | std::ios::binary);
     }
     return orig_SetFileInformationByHandle(file, information_class, file_information, size);
 }
