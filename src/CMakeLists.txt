@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 17) # C++17...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 add_executable(clang main.cpp custom_api.cpp)
 add_library(fafnir_injection SHARED dll_main.cpp custom_api.cpp)
+# remove "lib" prefix
+set_target_properties(fafnir_injection PROPERTIES PREFIX "")
 
 target_link_libraries(fafnir_injection ImageHlp)
 if(CMAKE_COMPILER_IS_GNUCXX)
