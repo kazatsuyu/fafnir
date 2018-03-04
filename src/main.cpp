@@ -95,7 +95,7 @@ int main() {
         std::wcerr << "error: " << path << " doesn't exist." << std::endl;
         return 1;
     }
-    std::ifstream target(path, std::ios::binary);
+    std::ifstream target(path.string(), std::ios::binary);
     auto target_path = read_path(target);
     target.close();
     if (!fs::exists(target_path)) {
