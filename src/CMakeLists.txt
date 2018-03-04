@@ -12,6 +12,21 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(clang stdc++fs)
     target_link_libraries(fafnir_injection stdc++fs)
 endif()
+if(MINGW)
+    message(STATUS "Installing system-libraries: MinGW DLLs.")
+    get_filename_component(Mingw_Path ${CMAKE_CXX_COMPILER} PATH)
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS ${Mingw_Path}/libstdc++-6.dll ${Mingw_Path}/libwinpthread-1.dll)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        # The exception model of msys2-mingw64-gcc is SEH
+        list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS ${Mingw_Path}/libgcc_s_seh-1.dll)
+    else()
+        # The exception model of msys2-mingw64-gcc is DWARF-2
+        list(APPEND CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS ${Mingw_Path}/libgcc_s_dw2-1.dll)
+    endif()
+    include(InstallRequiredSystemLibraries)
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION bin COMPONENT System)
+endif()
+
 target_compile_definitions(fafnir_injection PRIVATE FAFNIR_DLL)
 
 install(TARGETS clang RUNTIME DESTINATION bin)

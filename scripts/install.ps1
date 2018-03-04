@@ -140,13 +140,21 @@ function Install ($arch) {
     Copy-Item "$assets\clang\Toolset.targets" "$targetPath"
     $content = (Get-Content -Encoding UTF8 "$assets\clang\Toolset.props") -replace "{{LLVMDir}}",$LLVMDirectory
     Set-Content "$targetPath\Toolset.props" $content -Encoding UTF8
-    
-    if (!(Test-Path "$targetPath\bin")) {
-        New-Item -ItemType Directory "$targetPath\bin"
+
+    $targetBinPath = "$targetPath\bin"
+    if (!(Test-Path $targetBinPath)) {
+        New-Item -ItemType Directory $targetBinPath
     }
-    Copy-Item $bin "$targetPath\bin"
-    Copy-Item $dll "$targetPath\bin"
-    Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
+    Copy-Item $bin $targetBinPath
+    Copy-Item $dll $targetBinPath
+    $mingwDLLs = @("libstdc++-6.dll", "libwinpthread-1.dll", "libgcc_s_seh-1.dll", "libgcc_s_dw2-1.dll")
+    foreach ($mingwDLL in $mingwDLLs) {
+        $mingwDLLFullPath = "${rootDir}\bin\${mingwDLL}"
+        if (Test-Path $mingwDLLFullPath) {
+            Copy-Item $mingwDLLFullPath $targetBinPath
+        }
+    }
+    Set-Content -Path "${targetBinPath}\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
 
     if ($ClangClToolsetName -ne "") {
         $targetPath = "$platformDir\$ClangClToolsetName"
