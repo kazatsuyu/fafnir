@@ -1,7 +1,7 @@
 #include "set_winver.hpp"
 #include <string_view>
 #include <iostream>
-#include <filesystem>
+#include "filesystem.hpp"
 #include <fstream>
 #include <vector>
 #include <sstream>
@@ -62,7 +62,7 @@ file_type get_file_type(std::istream& in) noexcept {
 }
 
 template<auto f>
-std::experimental::filesystem::path read_path_impl(std::istream& in) noexcept {
+fs::path read_path_impl(std::istream& in) noexcept {
     std::ostringstream ss;
 
     for (auto ch = f(in); ch != std::char_traits<char32_t>::eof(); ch = f(in)) {
@@ -74,7 +74,7 @@ std::experimental::filesystem::path read_path_impl(std::istream& in) noexcept {
             reinterpret_cast<const wchar_t*>(str.data() + str.size())};
 }
 
-std::experimental::filesystem::path read_path(std::istream& in) noexcept {
+fs::path read_path(std::istream& in) noexcept {
     auto type = get_file_type(in);
     if (type == file_type::utf8_with_bom) {
         in.seekg(3);
@@ -91,14 +91,14 @@ int main() {
     using namespace fafnir;
 
     auto path = get_bin_path() / ".target";
-    if (!std::experimental::filesystem::exists(path)) {
+    if (!fs::exists(path)) {
         std::wcerr << "error: " << path << " doesn't exist." << std::endl;
         return 1;
     }
     std::ifstream target(path, std::ios::binary);
     auto target_path = read_path(target);
     target.close();
-    if (!std::experimental::filesystem::exists(target_path)) {
+    if (!fs::exists(target_path)) {
         std::wcerr << "error: " << target_path << " doesn't exist." << std::endl;
         return 1;
     }
