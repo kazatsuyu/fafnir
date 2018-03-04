@@ -36,7 +36,7 @@ $VSInstallDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Vis
 if (!$VSInstallDir) {
     $VSInstallDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7 "15.0"
 }
-$LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\LLVM\LLVM -ErrorAction 
+$LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\LLVM\LLVM -ErrorAction
 if (!$LLVMDir) {
     $LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\LLVM\LLVM
 }
@@ -78,11 +78,11 @@ do {
             break
         }
     }
-    
+
     if ($reset -or $ToolsetName -eq "") {
         $prompt = "What is the clang toolset name?"
         if ($reset) {
-            $prompt += "(current: $ToolsetName)" 
+            $prompt += "(current: $ToolsetName)"
         } else {
             $prompt += " (default: v100_clang_fafnir)"
         }
@@ -93,11 +93,11 @@ do {
             $ToolsetName = $tmp
         }
     }
-    
+
     if ($reset -or ($ClangClToolsetName -eq "" -and (Read-Host "Do you want to install a toolset for clang-cl? (y/N)") -match "y|yes")) {
         $prompt = "What is the clang-cl toolset name?"
         if ($reset) {
-            $prompt += "(current: $ClangClToolsetName)" 
+            $prompt += "(current: $ClangClToolsetName)"
         } else {
             $prompt += " (default: fafnir_clang_cl)"
         }
@@ -108,7 +108,7 @@ do {
             $ClangClToolsetName = $tmp
         }
     }
-    
+
     ""
     "=== Install configuration ==="
     "* LLVM install directory: $LLVMDirectory"
@@ -133,7 +133,7 @@ function Install ($arch) {
         return
     }
     $targetPath = "$platformDir\$ToolsetName"
-    
+
     if (!(Test-Path $targetPath)) {
         New-Item -ItemType Directory $targetPath
     }
