@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 3.10.0)
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 17) # C++17...
+set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 add_executable(clang main.cpp custom_api.cpp)
 add_library(fafnir_injection SHARED dll_main.cpp custom_api.cpp)
 
