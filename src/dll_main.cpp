@@ -1,7 +1,8 @@
+#include "set_winver.hpp"
 #include <cstddef>
 #include <Windows.h>
 #include <TlHelp32.h>
-#include <Dbghelp.h> 
+#include <Dbghelp.h>
 
 #include "custom_api.hpp"
 #include "fafnir.hpp"

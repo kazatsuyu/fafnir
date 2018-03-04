@@ -36,7 +36,7 @@ $VSInstallDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Vis
 if (!$VSInstallDir) {
     $VSInstallDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7 "15.0"
 }
-$LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\LLVM\LLVM -ErrorAction 
+$LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\LLVM\LLVM -ErrorAction
 if (!$LLVMDir) {
     $LLVMDir = Get-Registry Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\LLVM\LLVM
 }
@@ -78,11 +78,11 @@ do {
             break
         }
     }
-    
+
     if ($reset -or $ToolsetName -eq "") {
         $prompt = "What is the clang toolset name?"
         if ($reset) {
-            $prompt += "(current: $ToolsetName)" 
+            $prompt += "(current: $ToolsetName)"
         } else {
             $prompt += " (default: v100_clang_fafnir)"
         }
@@ -93,11 +93,11 @@ do {
             $ToolsetName = $tmp
         }
     }
-    
+
     if ($reset -or ($ClangClToolsetName -eq "" -and (Read-Host "Do you want to install a toolset for clang-cl? (y/N)") -match "y|yes")) {
         $prompt = "What is the clang-cl toolset name?"
         if ($reset) {
-            $prompt += "(current: $ClangClToolsetName)" 
+            $prompt += "(current: $ClangClToolsetName)"
         } else {
             $prompt += " (default: fafnir_clang_cl)"
         }
@@ -108,7 +108,7 @@ do {
             $ClangClToolsetName = $tmp
         }
     }
-    
+
     ""
     "=== Install configuration ==="
     "* LLVM install directory: $LLVMDirectory"
@@ -133,20 +133,28 @@ function Install ($arch) {
         return
     }
     $targetPath = "$platformDir\$ToolsetName"
-    
+
     if (!(Test-Path $targetPath)) {
         New-Item -ItemType Directory $targetPath
     }
     Copy-Item "$assets\clang\Toolset.targets" "$targetPath"
     $content = (Get-Content -Encoding UTF8 "$assets\clang\Toolset.props") -replace "{{LLVMDir}}",$LLVMDirectory
     Set-Content "$targetPath\Toolset.props" $content -Encoding UTF8
-    
-    if (!(Test-Path "$targetPath\bin")) {
-        New-Item -ItemType Directory "$targetPath\bin"
+
+    $targetBinPath = "$targetPath\bin"
+    if (!(Test-Path $targetBinPath)) {
+        New-Item -ItemType Directory $targetBinPath
     }
-    Copy-Item $bin "$targetPath\bin"
-    Copy-Item $dll "$targetPath\bin"
-    Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
+    Copy-Item $bin $targetBinPath
+    Copy-Item $dll $targetBinPath
+    $mingwDLLs = @("libstdc++-6.dll", "libwinpthread-1.dll", "libgcc_s_seh-1.dll", "libgcc_s_dw2-1.dll")
+    foreach ($mingwDLL in $mingwDLLs) {
+        $mingwDLLFullPath = "${rootDir}\bin\${mingwDLL}"
+        if (Test-Path $mingwDLLFullPath) {
+            Copy-Item $mingwDLLFullPath $targetBinPath
+        }
+    }
+    Set-Content -Path "${targetBinPath}\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
 
     if ($ClangClToolsetName -ne "") {
         $targetPath = "$platformDir\$ClangClToolsetName"

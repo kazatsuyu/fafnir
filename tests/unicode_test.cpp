@@ -1,5 +1,5 @@
 #include "../src/unicode.hpp"
-#include "../submodules/iutest/include/iutest.hpp"
+#include <iutest.hpp>
 #include <sstream>
 #include <string_view>
 
