@@ -146,7 +146,7 @@ function Install ($arch) {
     }
     Copy-Item $bin "$targetPath\bin"
     Copy-Item $dll "$targetPath\bin"
-    Set-Content -Path "$targetPath\bin\.target" "$LLVMDirectory\bin\clang.exe" -Encoding UTF8 -NoNewline
+    [IO.File]::WriteAllText("$targetPath\bin\.target","$LLVMDirectory\bin\clang.exe");
 
     if ($ClangClToolsetName -ne "") {
         $targetPath = "$platformDir\$ClangClToolsetName"
