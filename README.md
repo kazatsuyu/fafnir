@@ -1,53 +1,48 @@
+[日本語](./README_ja.md)
 # Fafnir
 
 Clang MSBuild toolset for Visual Studio 2017
 
-## 説明
+## What's this?
 
-Visual Studio 2017およびClang for Windowsがインストールされた環境で、MSBuildから利用できるツールセットを追加するツールです。
+This is a MSBuild toolset with LLVM Clang for Windows.
 
-## 前提条件
+## Requirements
 
 * Visual Studio 2017
-* Clang For Windows  
-  LLVMの公式サイトからインストーラーを[ダウンロード](http://releases.llvm.org/download.html)できます。  
-  [スナップショット ビルド](http://llvm.org/builds/)を利用することや、自分でビルドしたものを使うこともできます。
+* Clang for Windows
+  [Download](http://releases.llvm.org/download.html) from the LLVM website and install it, or use the [snapshot](http://llvm.org/builds/). You can also use one of your builds.
 
-## 使い方
+## Usage
 
-Clang for Windowsのホストアーキテクチャに合わせたビルドをダウンロードしてください。
+First, download the [latest release](https://github.com/kazatsuyu/fafnir/releases/). Its host architecture must be the same to that of Clang for Windows.
 
-### インストール
+### How to install
 
-install.batを実行し、対話式のインストーラーでLLVMのパスとインストールするツールセット名を指定してください。  
-実行には管理者権限が必要です。  
-なおCMakeから利用したい場合、ツールセット名は`v[0-9]+_clang_.*`にマッチする名前にしないといけません。  
+Run install.bat, and set the LLVM path and a toolset name. Administrator authority is required for installation. To use with CMake, the toolset name must match `v[0-9]+_clang_.*`.  
 
-### Visual Studio IDE 上から使う場合
+### How to use with Visual Studio IDE
 
-プロジェクトのプロパティを開いて、左側リストから \[構成プロパティ -> 全般\] を選び、 \[全般\] グループにある \[プラットフォーム ツールセット\] を開き、インストール時に指定した名前（デフォルトはv100_clang_fafnir）を選んでください。  
-後は普通にビルドすればLLVMのclangでコンパイルされます。
+Open the project property, select \[Configuration Properties -> General\] in the left list, select \[Platform toolset\] in \[General\] group, and select the toolset name that you set during the installation (the default name is v100_clang_fafnir). Then you can build the project using LLVM clang.
 
-### CMakeから使う場合
+### How to use with CMake
 
-cmakeコマンドを実行する時に `-G` オプションで `"Visual Studio 15 2017"` もしくは `"Visual Studio 15 2017 Win64"` を指定し、 `-T` オプションでインストール時に指定した名前を選んでください。
+When you run cmake command, specify `"Visual Studio 15 2017"` or `"Visual Studio 15 2017 Win64"` to the option `-G`, specify the toolset name, that you set during the installation, to the option `-T`.
 
-## ビルド方法
+## How to build Fafnir
 
-今のところ、Fafnirをビルドするには、Fafnirを利用してインストールしたツールセットが必要です。  
-また、LLVMはC++17に対応したものが必要です。（リリース物は[LLVM Snapshot Build](http://llvm.org/builds/)を利用しています。
-また、ビルドシステムはCMakeに依存しています。
+The toolset installed by Fafnir is required to build Fafnir. Also, LLVM that supports C++17 must be used (e.g. the release binaries of Fafnir are built with the [LLVM Snapshot Build](http://llvm.org/builds/)). CMake is also required.
 
-* 64bit版ビルド
+* Build 64bit version
 ```
-cmake -G "Visual Studio 15 2017 Win64" -T <インストール済みFafnirツールセット> -DCMAKE_INSTALL_PREFIX=<インストール先のパス>
+cmake -G "Visual Studio 15 2017 Win64" -T <installed Fafnir toolset> -DCMAKE_INSTALL_PREFIX=<path to install>
 cmake --build . --config Release --target INSTALL
 ```
 
-* 32bit版ビルド
+* Build 32bit version
 ```
-cmake -G "Visual Studio 15 2017" -T <インストール済みFafnirツールセット> -DCMAKE_INSTALL_PREFIX=<インストール先のパス>
+cmake -G "Visual Studio 15 2017" -T <installed Fafnir toolset> -DCMAKE_INSTALL_PREFIX=<path to install>
 cmake --build . --config Release --target INSTALL
 ```
 
-上記のコマンドで、インストール先にリリース物と同じ構成でファイルが配置されます。
+Run the above commands, and then you will find deployed files in the install path.
