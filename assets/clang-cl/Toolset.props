@@ -11,6 +11,10 @@
 
   <ItemDefinitionGroup>
     <ClCompile>
+      <!-- clang-cl embeds debug data in obj files. does not generate pdb per lib. if not cleared projects will always appear out of date to MSVS. -->
+      <ProgramDataBaseFileName/>
+      <!-- /Gm- /Gm option not recognized or used by clang-cl, causing an annoying warning. -->
+      <MinimalRebuild/>
       <AdditionalOptions Condition="'$(Platform)'=='Win32'">-m32 -fmsc-version=1910 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Platform)'=='x64'">-m64 -fmsc-version=1910 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
