@@ -21,6 +21,18 @@ First, download the [latest release](https://github.com/kazatsuyu/fafnir/release
 
 Run install.bat, and set the LLVM path and a toolset name. Administrator authority is required for installation. To use with CMake, the toolset name must match `v[0-9]+_clang_.*`.  
 
+### How to uninstall
+
+Currently, there is no script provided and the installed toolsets can be removed manually.
+
+```
+dir $(VSInstallDir)\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\
+
+rmdir /s /q $(VSInstallDir)\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\$(YourToolsetName)
+rmdir /s /q $(VSInstallDir)\Common7\IDE\VC\VCTargets\Platforms\x64\PlatformToolsets\$(YourToolsetName)
+```
+where variable `$(VSInstallDir)` denotes Visual Studio installation path and `$(YourToolsetName)` is name of the installed clang toolset.
+
 ### How to use with Visual Studio IDE
 
 Open the project property, select \[Configuration Properties -> General\] in the left list, select \[Platform toolset\] in \[General\] group, and select the toolset name that you set during the installation (the default name is v100_clang_fafnir). Then you can build the project using LLVM clang.
